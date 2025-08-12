@@ -46,3 +46,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Invalid request" }, { status: 400 });
   }
 }
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const filterUserId = searchParams.get("userId");
+  const filterUserEmail = searchParams.get("userEmail");
+
+  const bookings = await readJsonFile<BookingData[]>("bookings.json", []);
+
+  const filtered = bookings.filter(b => {
+    if (filterUserId && b.userId !== filterUserId) return false;
+    if (filterUserEmail && b.userEmail.toLowerCase() !== filterUserEmail.toLowerCase()) return false;
+    return true;
+  });
+
+  return NextResponse.json(filtered, { status: 200 });
+}
